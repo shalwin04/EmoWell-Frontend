@@ -7,6 +7,12 @@ module.exports = {
     extend: {
       colors: {
         primary: "#EAE5D6",
+        secondary: "#C1B98E",
+        beige: "#F6F0E0",
+        carmin: "##B23A33",
+        sand: "#E3C9B0",
+        burgundy: "#402522",
+        pFont: "#3E1307",
       },
       fontFamily: {
         sans: ["Inter var", "Inter", "sans-serif"],

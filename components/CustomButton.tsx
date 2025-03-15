@@ -21,7 +21,6 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       onPress={handlePress}
       //   activeOpacity={0.8}
       style={{
-        backgroundColor: "primary",
         padding: 8,
         borderRadius: 9999,
         borderWidth: 1,

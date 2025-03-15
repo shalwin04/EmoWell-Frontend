@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { ScrollView, Text, View, Image } from "react-native";
-import { Link } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "@/components/CustomButton";
 
@@ -9,11 +9,6 @@ export default function App() {
     <SafeAreaView className="bg-primary h-full">
       <ScrollView contentContainerStyle={{ height: "100%" }}>
         <View className="mx-8 w-auto h-1/2 bg-black flex items-center justify-center px-4 rounded-3xl mt-8 overflow-hidden">
-          {/* <Image
-            source={require("../assets/images/EmPills.png")}
-            className="w-[50px] h-[50px] absolute top-[60px] left-[240px] transform rotate-20"
-            resizeMode="contain"
-          /> */}
           <Image
             source={require("../assets/images/EmoClust.png")}
             className="w-[395px] h-120 absolute transform rotate-90 top-[-400px]"
@@ -45,7 +40,7 @@ export default function App() {
             handlePress={() => {
               console.log("Blogs button pressed");
             }}
-            containerStyles="absolute right-[10px]"
+            containerStyles="absolute bg-primary right-[10px]"
           />
           <Text className="text-6xl font-playItalic tracking-wider mt-20">
             Let's get
@@ -56,6 +51,7 @@ export default function App() {
           <CustomButton
             title="Sign Up"
             handlePress={() => {
+              router.push("/chat-screen");
               console.log("Sign Up button pressed");
             }}
             containerStyles="absolute bg-black right-[240px] bottom-[-80px]"
@@ -64,9 +60,10 @@ export default function App() {
           <CustomButton
             title="Login"
             handlePress={() => {
+              router.push("/sign-in");
               console.log("Login button pressed");
             }}
-            containerStyles="absolute right-[10px] bottom-[-80px]"
+            containerStyles="absolute bg-primary right-[10px] bottom-[-80px]"
           />
         </View>
         <StatusBar style="auto" />
