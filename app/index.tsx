@@ -51,7 +51,7 @@ export default function App() {
           <CustomButton
             title="Sign Up"
             handlePress={() => {
-              router.push("/chat-screen");
+              router.push("/sign-up");
               console.log("Sign Up button pressed");
             }}
             containerStyles="absolute bg-black right-[240px] bottom-[-80px]"
