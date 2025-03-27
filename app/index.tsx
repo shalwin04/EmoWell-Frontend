@@ -29,18 +29,18 @@ export default function App() {
             className="w-[60px] h-[60px] absolute bottom-[35px] left-[220px] transform rotate-20"
             resizeMode="contain"
           />
-          <Text className="text-3xl color-purple-50 font-playBold  bottom-[-130px] mt-4">
+          <Text className="text-3xl color-purple-50 font-playBold bottom-[-130px] mt-4">
             EmoWell.
           </Text>
         </View>
+        
         <View className="flex mx-4 px-4 mt-8">
-          {/* <Text className="px-6 text-3xl font-playBold mt-8">Hi,</Text> */}
           <CustomButton
             title="Blogs"
             handlePress={() => {
               console.log("Blogs button pressed");
             }}
-            containerStyles="absolute bg-primary right-[10px]"
+            containerStyles="absolute bg-primary right-[40px] bottom-[-20px]"
           />
           <Text className="text-6xl font-playItalic tracking-wider mt-20">
             Let's get
@@ -58,12 +58,20 @@ export default function App() {
             textStyles="text-white"
           />
           <CustomButton
+            title="Chat"
+            handlePress={() => {
+              router.push("/(tabs)/chat-screen");
+              console.log("Chat button pressed");
+            }}
+            containerStyles="absolute bg-primary right-[40px] bottom-[-140px]"
+          />
+          <CustomButton
             title="Login"
             handlePress={() => {
               router.push("/sign-in");
               console.log("Login button pressed");
             }}
-            containerStyles="absolute bg-primary right-[10px] bottom-[-80px]"
+            containerStyles="absolute bg-primary right-[40px] bottom-[-80px]"
           />
         </View>
         <StatusBar style="auto" />

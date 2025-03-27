@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   TextInput,
@@ -11,10 +10,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   StatusBar,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Send } from "react-native-feather";
+import { Keyboard } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// Message type definition
+
 interface Message {
   id: string;
   content: string;
@@ -26,6 +28,14 @@ export default function ChatSceeen() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const flatListRef = useRef<FlatList<Message>>(null);
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      StatusBar.setBackgroundColor('#ffffff');
+      StatusBar.setTranslucent(false);
+      StatusBar.setBarStyle('dark-content');
+    }
+  }, []);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -104,95 +114,128 @@ export default function ChatSceeen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* <StatusBar barStyle="dark-content" backgroundColor="#fff" /> */}
-
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Supportive Chat</Text>
-      </View>
-
-      {/* Chat Messages */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
-      >
-        {messages.length === 0 ? (
-          <View style={styles.emptyStateContainer}>
-            <Text style={styles.emptyStateTitle}>
-              Welcome to Supportive Chat
-            </Text>
-            <Text style={styles.emptyStateText}>
-              Share what's on your mind, and I'm here to listen and support you.
-            </Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#EAE5D6' }} edges={['top', 'left', 'right']}>
+        <View style={{ flex: 1 }}>
+          {/* Header Tab */}
+          <View style={styles.headerContainer}>
+            <Text className="font-playBold text-2xl text-burgundy text-center">Supportive Chat</Text>
+            <View style={styles.headerLine}>
+              <View style={styles.headerLineInner} />
+            </View>
           </View>
-        ) : (
-          <FlatList
-            ref={flatListRef}
-            data={messages}
-            renderItem={renderMessage}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.messageList}
-          />
-        )}
 
-        {/* Input Area */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            value={input}
-            onChangeText={setInput}
-            placeholder="Type your message here..."
-            multiline
-            maxLength={500}
-          />
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              (!input.trim() || isLoading) && styles.sendButtonDisabled,
-            ]}
-            onPress={handleSend}
-            disabled={!input.trim() || isLoading}
+          {/* Chat Container */}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.keyboardAvoidingView}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
           >
-            {isLoading ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Send stroke="#fff" width={20} height={20} />
-            )}
-          </TouchableOpacity>
+            <View className="flex-1 px-4">
+              <View
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "rgba(244, 223, 205, 0.3)",
+                  borderRadius: 20,
+                  overflow: "hidden",
+                }}
+              >
+                {messages.length === 0 ? (
+                  <View style={styles.emptyStateContainer}>
+                    <Text style={styles.emptyStateTitle}>
+                      Welcome to Supportive Chat
+                    </Text>
+                    <Text style={styles.emptyStateText}>
+                      Share what's on your mind, and I'm here to listen and support you.
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    ref={flatListRef}
+                    data={messages}
+                    renderItem={renderMessage}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={styles.messageList}
+                  />
+                )}
+
+                <View style={styles.inputContainer}>
+                  <View style={styles.inputWrapper}>
+                    <TextInput
+                      style={styles.input}
+                      value={input}
+                      onChangeText={setInput}
+                      placeholder="Type your message here..."
+                      multiline
+                      maxLength={500}
+                      placeholderTextColor="#666"
+                      returnKeyType="send"
+                      onSubmitEditing={handleSend}
+                    />
+                    <TouchableOpacity
+                      style={[
+                        styles.sendButton,
+                        (!input.trim() || isLoading) && styles.sendButtonDisabled,
+                      ]}
+                      onPress={handleSend}
+                      disabled={!input.trim() || isLoading}
+                    >
+                      {isLoading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                      ) : (
+                        <Send stroke="#fff" width={16} height={16} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f7fa",
+  headerContainer: {
+    backgroundColor: '#EAE5D6',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    width: '100%',
+    position: 'relative',
   },
-  header: {
-    padding: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e1e4e8",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+  headerLine: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: '#B76E79',
+    opacity: 0.8,
+    shadowColor: '#B76E79',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-    textAlign: "center",
+  headerLineInner: {
+    position: 'absolute',
+    bottom: 0,
+    left: '20%',
+    right: '20%',
+    height: 2,
+    backgroundColor: '#D4A5AC',
+    opacity: 0.6,
   },
   keyboardAvoidingView: {
     flex: 1,
+    width: "100%",
   },
   messageList: {
     padding: 16,
+    flexGrow: 1,
   },
   messageBubble: {
     maxWidth: "80%",
@@ -202,7 +245,7 @@ const styles = StyleSheet.create({
   },
   userMessage: {
     alignSelf: "flex-end",
-    backgroundColor: "#4a7dfc",
+    backgroundColor: "#B76E79",
     borderBottomRightRadius: 4,
   },
   assistantMessage: {
@@ -226,35 +269,40 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   inputContainer: {
-    flexDirection: "row",
     padding: 12,
-    backgroundColor: "#fff",
+    paddingBottom: Platform.OS === 'ios' ? 24 : 16,
+    backgroundColor: "transparent",
     borderTopWidth: 1,
-    borderTopColor: "#e1e4e8",
+    borderTopColor: "rgba(0, 0, 0, 0.1)",
+    width: "100%",
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    paddingRight: 4,
   },
   input: {
     flex: 1,
-    backgroundColor: "#f5f7fa",
-    borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    paddingRight: 48,
     fontSize: 16,
     maxHeight: 120,
+    color: "#333",
+    minHeight: 40,
   },
   sendButton: {
-    position: "absolute",
-    right: 20,
-    bottom: 20,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#4a7dfc",
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#B76E79",
     justifyContent: "center",
     alignItems: "center",
+    marginRight: 4,
   },
   sendButtonDisabled: {
-    backgroundColor: "#a0b4f9",
+    backgroundColor: "#D4A5AC",
   },
   emptyStateContainer: {
     flex: 1,
