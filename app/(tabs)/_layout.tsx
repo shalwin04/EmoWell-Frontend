@@ -26,6 +26,11 @@ const TabsLayout = () => {
             backgroundColor: "#ffffff",
           },
           headerTintColor: "#000000",
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            fontWeight: "bold",
+            fontSize: 20,
+          },
         }}
       >
         <Tabs.Screen

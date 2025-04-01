@@ -5,6 +5,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 const Journal = () => {
   const [entry, setEntry] = useState("");
+  const [title, setTitle] = useState("Untitled");
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
   const currentDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -15,7 +17,17 @@ const Journal = () => {
   const handleSave = () => {
     // TODO: Implement save functionality
     console.log("Saving entry:", entry);
+    console.log("Title:", title);
     setEntry("");
+    Keyboard.dismiss();
+  };
+
+  const handleTitleSubmit = () => {
+    // If title is empty or just whitespace, reset to "Untitled"
+    if (!title.trim()) {
+      setTitle("Untitled");
+    }
+    setIsEditingTitle(false);
     Keyboard.dismiss();
   };
 
@@ -28,7 +40,21 @@ const Journal = () => {
         >
           <View className="pb-2 border-b border-gray-200 mb-2">
             <View className="px-4 pb-2">
-              <Text className="text-2xl font-bold text-gray-800">Journal</Text>
+              {isEditingTitle ? (
+                <TextInput
+                  className="text-2xl font-bold text-gray-800"
+                  value={title}
+                  onChangeText={setTitle}
+                  onBlur={handleTitleSubmit}
+                  onSubmitEditing={handleTitleSubmit}
+                  autoFocus
+                  style={styles.titleInput}
+                />
+              ) : (
+                <TouchableOpacity onPress={() => setIsEditingTitle(true)}>
+                  <Text className="text-2xl font-bold text-gray-800">{title}</Text>
+                </TouchableOpacity>
+              )}
               <Text className="text-sm text-gray-600 mt-1">{currentDate}</Text>
             </View>
           </View>
@@ -76,6 +102,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+  },
+  titleInput: {
+    fontWeight: 'bold',
+    padding: 0,
+    margin: 0,
   },
 });
 

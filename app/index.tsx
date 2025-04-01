@@ -42,10 +42,10 @@ export default function App() {
             Started !
           </Text>
           <CustomButton
-            title="Get Started"
+            title="Login"
             handlePress={() => {
-              router.push("/(tabs)/chat-screen");
-              console.log("Get Started button pressed");
+              router.push("/(auth)/sign-in");
+              console.log("Login button pressed");
             }}
             containerStyles="absolute bg-black right-[240px] bottom-[-80px]"
             textStyles="text-white"
@@ -53,18 +53,10 @@ export default function App() {
           <CustomButton
             title="Sign Up"
             handlePress={() => {
-              router.push("/sign-up");
+              router.push("/(auth)/sign-up");
               console.log("Sign Up button pressed");
             }}
             containerStyles="absolute bg-primary right-[40px] bottom-[-80px]"
-          />
-          <CustomButton
-            title="Login"
-            handlePress={() => {
-              router.push("/sign-in");
-              console.log("Login button pressed");
-            }}
-            containerStyles="absolute bg-primary right-[40px] bottom-[-140px]"
           />
         </View>
         <StatusBar style="auto" />
