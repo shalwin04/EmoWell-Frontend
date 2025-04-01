@@ -1,83 +1,63 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { Stack, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import CustomButton from '@/components/CustomButton';
+import { useRouter } from 'expo-router';
 
-// Sample blog data - replace with actual data from your backend
-const blogPosts = [
+const blogs = [
   {
     id: 1,
-    title: 'Understanding Anxiety: A Comprehensive Guide',
-    excerpt: 'Learn about the different types of anxiety and effective coping strategies...',
-    author: 'Dr. Sarah Johnson',
-    date: 'March 28, 2024',
-    readTime: '5 min read',
-    image: 'https://picsum.photos/400/200',
+    title: 'Managing Anxiety',
+    description: 'Learn effective ways to cope with anxiety and stress in your daily life.',
+    image: 'https://picsum.photos/300/200',
   },
   {
     id: 2,
-    title: 'The Power of Mindfulness in Daily Life',
-    excerpt: 'Discover how mindfulness practices can improve your mental well-being...',
-    author: 'Dr. Michael Chen',
-    date: 'March 27, 2024',
-    readTime: '4 min read',
-    image: 'https://picsum.photos/400/201',
+    title: 'Mindfulness Tips',
+    description: 'Practice mindfulness to improve your mental well-being and reduce stress.',
+    image: 'https://picsum.photos/300/201',
   },
-  // Add more blog posts as needed
+  {
+    id: 3,
+    title: 'Healthy Sleep Habits',
+    description: 'Develop good sleep routines for better mental health and daily energy.',
+    image: 'https://picsum.photos/300/202',
+  },
+  {
+    id: 4,
+    title: 'Dealing with Stress',
+    description: 'Effective strategies to manage stress and maintain work-life balance.',
+    image: 'https://picsum.photos/300/203',
+  },
 ];
 
-const BlogPost = ({ post }: { post: typeof blogPosts[0] }) => (
-  <TouchableOpacity className="bg-white rounded-3xl shadow-md mb-6 overflow-hidden border border-gray-200">
-    <Image
-      source={{ uri: post.image }}
-      className="w-full h-48"
-      resizeMode="cover"
-    />
-    <View className="p-6">
-      <Text className="text-xl font-playBold text-burgundy mb-3">{post.title}</Text>
-      <Text className="text-gray-600 mb-4 font-pRegular">{post.excerpt}</Text>
-      <View className="flex-row justify-between items-center">
-        <Text className="text-sm text-gray-500 font-pLight">{post.author}</Text>
-        <View className="flex-row items-center">
-          <Text className="text-sm text-gray-500 mr-3 font-pLight">{post.date}</Text>
-          <Text className="text-sm text-gray-500 font-pLight">{post.readTime}</Text>
-        </View>
-      </View>
-    </View>
-  </TouchableOpacity>
-);
-
 export default function BlogsScreen() {
+  const router = useRouter();
+
   return (
-    <SafeAreaView className="flex-1 bg-primary">
-      <Stack.Screen
-        options={{
-          title: 'Blogs',
-          headerStyle: {
-            backgroundColor: '#EAE5D6',
-          },
-          headerShadowVisible: false,
-          headerTitleStyle: {
-            fontFamily: 'Playfair-Bold',
-            color: '#402522',
-          },
-        }}
-      />
-      <View className="flex-row items-center px-4 py-2">
-        <CustomButton
-          title="Back"
-          handlePress={() => router.back()}
-          containerStyles="bg-black"
-          textStyles="text-white"
-        />
-      </View>
-      <ScrollView className="flex-1 px-4">
-        <Text className="text-3xl font-playBold text-burgundy mb-6 mt-4">Latest Articles</Text>
-        {blogPosts.map((post) => (
-          <BlogPost key={post.id} post={post} />
-        ))}
+    <View className="flex-1 bg-primary px-4 pt-4">
+      <Text className="text-2xl font-bold text-gray-900 mb-4 mt-0">Latest Articles</Text>
+      <ScrollView className="flex-1">
+        <View className="flex-row flex-wrap justify-between">
+          {blogs.map((blog) => (
+            <TouchableOpacity
+              key={blog.id}
+              className="w-[48%] bg-white rounded-2xl p-4 mb-4 shadow-lg"
+              onPress={() => router.push(`/blog/${blog.id}`)}
+            >
+              <View className="relative">
+                <Image 
+                  source={{ uri: blog.image }} 
+                  className="w-full h-36 rounded-lg"
+                />
+                <View className="absolute inset-0 bg-black/20 rounded-lg" />
+              </View>
+              <Text className="text-lg font-semibold mt-2 text-gray-900">{blog.title}</Text>
+              <Text className="text-sm text-gray-700 mt-1" numberOfLines={2}>{blog.description}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
-} 
+}
+

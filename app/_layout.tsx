@@ -5,6 +5,7 @@ import "../global.css";
 import { useEffect } from "react";
 import { Platform, StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import changeNavigationBarColor from 'react-native-navigation-bar-color';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,9 +32,11 @@ export default function RootLayout() {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
       if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor('transparent');
-        StatusBar.setTranslucent(true);
-        StatusBar.setBarStyle('dark-content');
+        try {
+          changeNavigationBarColor('#ffffff', true);
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
   }, [fontsLoaded, error]);

@@ -35,13 +35,6 @@ export default function App() {
         </View>
         
         <View className="flex mx-4 px-4 mt-8">
-          <CustomButton
-            title="Blogs"
-            handlePress={() => {
-              console.log("Blogs button pressed");
-            }}
-            containerStyles="absolute bg-primary right-[40px] bottom-[-20px]"
-          />
           <Text className="text-6xl font-playItalic tracking-wider mt-20">
             Let's get
           </Text>
@@ -49,21 +42,21 @@ export default function App() {
             Started !
           </Text>
           <CustomButton
-            title="Sign Up"
+            title="Get Started"
             handlePress={() => {
-              router.push("/sign-up");
-              console.log("Sign Up button pressed");
+              router.push("/(tabs)/chat-screen");
+              console.log("Get Started button pressed");
             }}
             containerStyles="absolute bg-black right-[240px] bottom-[-80px]"
             textStyles="text-white"
           />
           <CustomButton
-            title="Chat"
+            title="Sign Up"
             handlePress={() => {
-              router.push("/(tabs)/chat-screen");
-              console.log("Chat button pressed");
+              router.push("/sign-up");
+              console.log("Sign Up button pressed");
             }}
-            containerStyles="absolute bg-primary right-[40px] bottom-[-140px]"
+            containerStyles="absolute bg-primary right-[40px] bottom-[-80px]"
           />
           <CustomButton
             title="Login"
@@ -71,7 +64,7 @@ export default function App() {
               router.push("/sign-in");
               console.log("Login button pressed");
             }}
-            containerStyles="absolute bg-primary right-[40px] bottom-[-80px]"
+            containerStyles="absolute bg-primary right-[40px] bottom-[-140px]"
           />
         </View>
         <StatusBar style="auto" />
