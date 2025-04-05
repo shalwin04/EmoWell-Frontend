@@ -9,11 +9,10 @@ import {
   Platform,
   StyleSheet,
   ActivityIndicator,
-  StatusBar,
   TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { Send } from "react-native-feather";
-import { Keyboard } from "react-native";
 
 interface Message {
   id: string;
@@ -21,26 +20,40 @@ interface Message {
   role: "user" | "assistant";
 }
 
-export default function ChatSceeen() {
+export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const flatListRef = useRef<FlatList<Message>>(null);
 
-  // Scroll to bottom when messages change
+  // Scroll to end when new messages are added
   useEffect(() => {
     if (messages.length > 0) {
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      // For inverted lists, scrollToEnd actually means scrolling to top
+      flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     }
   }, [messages]);
 
-  // Handle sending a message
+  // Handle keyboard appearance
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => {
+        if (messages.length > 0) {
+          flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+        }
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, [messages.length]);
+
+  // Function to call backend
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    // Add user message to the chat
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input.trim(),
@@ -52,36 +65,42 @@ export default function ChatSceeen() {
     setIsLoading(true);
 
     try {
-      // In a real app, this would call your API
-      const response = await fetchAIResponse(userMessage.content);
+      const response = await fetch("http://localhost:3000/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userMessage.content }),
+      });
 
-      // Add AI response to the chat
+      if (!response.ok) {
+        throw new Error("Failed to fetch AI response");
+      }
+
+      const data = await response.json();
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: response,
+        content: data.response, // Updated to match your backend
         role: "assistant",
       };
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error("Error fetching AI response:", error);
-      // Optionally, display an error message in the chat here.
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          content: "Error: Unable to get response.",
+          role: "assistant",
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Mock function to simulate API call to your backend
-  const fetchAIResponse = async (userMessage: string): Promise<string> => {
-    // Replace this with your actual API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve("It's completely normal to feel anxious sometimes");
-      }, 1500); // Simulate network delay
-    });
-  };
-
-  // Render an individual message
   const renderMessage = ({ item }: { item: Message }) => {
     const isUser = item.role === "user";
     return (
@@ -106,8 +125,6 @@ export default function ChatSceeen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        
-        {/* Main Content */}
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardAvoidingView}
@@ -121,16 +138,39 @@ export default function ChatSceeen() {
                     Welcome to Supportive Chat
                   </Text>
                   <Text style={styles.emptyStateText}>
-                    Share what's on your mind, and I'm here to listen and support you.
+                    Share what's on your mind, and I'm here to listen and
+                    support you.
                   </Text>
                 </View>
               ) : (
                 <FlatList
                   ref={flatListRef}
-                  data={messages}
+                  data={[...messages].reverse()}
                   renderItem={renderMessage}
                   keyExtractor={(item) => item.id}
                   contentContainerStyle={styles.messageList}
+                  inverted
+                  keyboardShouldPersistTaps="handled"
+                  showsVerticalScrollIndicator={true}
+                  initialNumToRender={20}
+                  maxToRenderPerBatch={10}
+                  windowSize={21}
+                  onContentSizeChange={() =>
+                    flatListRef.current?.scrollToOffset({
+                      offset: 0,
+                      animated: false,
+                    })
+                  }
+                  onLayout={() =>
+                    flatListRef.current?.scrollToOffset({
+                      offset: 0,
+                      animated: false,
+                    })
+                  }
+                  maintainVisibleContentPosition={{
+                    minIndexForVisible: 0,
+                    autoscrollToTopThreshold: 10,
+                  }}
                 />
               )}
             </View>
@@ -147,6 +187,7 @@ export default function ChatSceeen() {
                   placeholderTextColor="#888"
                   returnKeyType="send"
                   onSubmitEditing={handleSend}
+                  blurOnSubmit={Platform.OS === "ios"}
                 />
                 <TouchableOpacity
                   style={[
@@ -172,44 +213,20 @@ export default function ChatSceeen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#EAE5D6',
-  },
-  header: {
-    width: '100%',
-    paddingVertical: 15,
-    paddingTop: Platform.OS === 'android' ? 40 : 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    backgroundColor: '#EAE5D6',
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
+  container: { flex: 1, backgroundColor: "#EAE5D6" },
+  contentContainer: { flex: 1, justifyContent: "space-between" },
+  keyboardAvoidingView: { flex: 1 },
   chatContainer: {
     flex: 1,
     margin: 15,
-    marginBottom: 5,
     padding: 5,
     backgroundColor: "rgba(244, 223, 205, 0.3)",
     borderRadius: 20,
   },
   messageList: {
-    padding: 16,
     flexGrow: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
   },
   messageBubble: {
     maxWidth: "80%",
@@ -232,20 +249,12 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     elevation: 1,
   },
-  messageText: {
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  userMessageText: {
-    color: "#fff",
-  },
-  assistantMessageText: {
-    color: "#333",
-  },
+  messageText: { fontSize: 16, lineHeight: 22 },
+  userMessageText: { color: "#fff" },
+  assistantMessageText: { color: "#333" },
   inputContainer: {
     paddingHorizontal: 15,
     paddingVertical: 10,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
     backgroundColor: "#EAE5D6",
   },
   inputWrapper: {
@@ -267,9 +276,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     fontSize: 16,
     color: "#333",
-    minHeight: 50,
-    maxHeight: 120,
-    textAlignVertical: 'bottom',
+    maxHeight: 120, // Limit max height for multi-line input
   },
   sendButton: {
     width: 35,
@@ -280,9 +287,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 5,
   },
-  sendButtonDisabled: {
-    backgroundColor: "#D4A5AC",
-  },
+  sendButtonDisabled: { backgroundColor: "#D4A5AC" },
   emptyStateContainer: {
     flex: 1,
     justifyContent: "center",
@@ -295,7 +300,6 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 10,
     textAlign: "center",
-    width: '100%',
   },
   emptyStateText: {
     fontSize: 16,
@@ -303,6 +307,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
     maxWidth: "90%",
-    alignSelf: 'center',
   },
 });
