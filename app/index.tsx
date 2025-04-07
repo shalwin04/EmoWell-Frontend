@@ -3,8 +3,9 @@ import { ScrollView, Text, View, Image } from "react-native";
 import { Redirect, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "@/components/CustomButton";
+import "expo-router/entry";
 
-export default function App() {
+export default function HomePage() {
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView contentContainerStyle={{ height: "100%" }}>
@@ -33,7 +34,7 @@ export default function App() {
             EmoWell.
           </Text>
         </View>
-        
+
         <View className="flex mx-4 px-4 mt-8">
           <Text className="text-6xl font-playItalic tracking-wider mt-20">
             Let's get

@@ -5,12 +5,14 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
+  ScrollView,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   ActivityIndicator,
   TouchableWithoutFeedback,
   Keyboard,
+  _ScrollView,
 } from "react-native";
 import { Send } from "react-native-feather";
 
@@ -124,90 +126,92 @@ export default function ChatScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.keyboardAvoidingView}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 30}
-        >
-          <View style={styles.contentContainer}>
-            <View style={styles.chatContainer}>
-              {messages.length === 0 ? (
-                <View style={styles.emptyStateContainer}>
-                  <Text style={styles.emptyStateTitle}>
-                    Welcome to Supportive Chat
-                  </Text>
-                  <Text style={styles.emptyStateText}>
-                    Share what's on your mind, and I'm here to listen and
-                    support you.
-                  </Text>
-                </View>
-              ) : (
-                <FlatList
-                  ref={flatListRef}
-                  data={[...messages].reverse()}
-                  renderItem={renderMessage}
-                  keyExtractor={(item) => item.id}
-                  contentContainerStyle={styles.messageList}
-                  inverted
-                  keyboardShouldPersistTaps="handled"
-                  showsVerticalScrollIndicator={true}
-                  initialNumToRender={20}
-                  maxToRenderPerBatch={10}
-                  windowSize={21}
-                  onContentSizeChange={() =>
-                    flatListRef.current?.scrollToOffset({
-                      offset: 0,
-                      animated: false,
-                    })
-                  }
-                  onLayout={() =>
-                    flatListRef.current?.scrollToOffset({
-                      offset: 0,
-                      animated: false,
-                    })
-                  }
-                  maintainVisibleContentPosition={{
-                    minIndexForVisible: 0,
-                    autoscrollToTopThreshold: 10,
-                  }}
-                />
-              )}
-            </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.container}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.keyboardAvoidingView}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 30}
+          >
+            <View style={styles.contentContainer}>
+              <View style={styles.chatContainer}>
+                {messages.length === 0 ? (
+                  <View style={styles.emptyStateContainer}>
+                    <Text style={styles.emptyStateTitle}>
+                      Welcome to Supportive Chat
+                    </Text>
+                    <Text style={styles.emptyStateText}>
+                      Share what's on your mind, and I'm here to listen and
+                      support you.
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    ref={flatListRef}
+                    data={[...messages].reverse()}
+                    renderItem={renderMessage}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={styles.messageList}
+                    inverted
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={true}
+                    initialNumToRender={20}
+                    maxToRenderPerBatch={10}
+                    windowSize={21}
+                    onContentSizeChange={() =>
+                      flatListRef.current?.scrollToOffset({
+                        offset: 0,
+                        animated: false,
+                      })
+                    }
+                    onLayout={() =>
+                      flatListRef.current?.scrollToOffset({
+                        offset: 0,
+                        animated: false,
+                      })
+                    }
+                    maintainVisibleContentPosition={{
+                      minIndexForVisible: 0,
+                      autoscrollToTopThreshold: 10,
+                    }}
+                  />
+                )}
+              </View>
 
-            <View style={styles.inputContainer}>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.input}
-                  value={input}
-                  onChangeText={setInput}
-                  placeholder="Type your message here..."
-                  multiline
-                  maxLength={500}
-                  placeholderTextColor="#888"
-                  returnKeyType="send"
-                  onSubmitEditing={handleSend}
-                  blurOnSubmit={Platform.OS === "ios"}
-                />
-                <TouchableOpacity
-                  style={[
-                    styles.sendButton,
-                    (!input.trim() || isLoading) && styles.sendButtonDisabled,
-                  ]}
-                  onPress={handleSend}
-                  disabled={!input.trim() || isLoading}
-                >
-                  {isLoading ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                  ) : (
-                    <Send stroke="#fff" width={16} height={16} />
-                  )}
-                </TouchableOpacity>
+              <View style={styles.inputContainer}>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={styles.input}
+                    value={input}
+                    onChangeText={setInput}
+                    placeholder="Type your message here..."
+                    multiline
+                    maxLength={500}
+                    placeholderTextColor="#888"
+                    returnKeyType="send"
+                    onSubmitEditing={handleSend}
+                    blurOnSubmit={Platform.OS === "ios"}
+                  />
+                  <TouchableOpacity
+                    style={[
+                      styles.sendButton,
+                      (!input.trim() || isLoading) && styles.sendButtonDisabled,
+                    ]}
+                    onPress={handleSend}
+                    disabled={!input.trim() || isLoading}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Send stroke="#fff" width={16} height={16} />
+                    )}
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
+          </KeyboardAvoidingView>
+        </View>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 }

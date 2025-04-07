@@ -5,9 +5,15 @@ import "../global.css";
 import { useEffect } from "react";
 import { Platform, StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import changeNavigationBarColor from 'react-native-navigation-bar-color';
+import changeNavigationBarColor from "react-native-navigation-bar-color";
+import { AuthProvider } from "../context/authContext";
 
+// Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
+
+export const unstable_settings = {
+  initialRouteName: "(home)",
+};
 
 export default function RootLayout() {
   const [fontsLoaded, error] = useFonts({
@@ -31,9 +37,9 @@ export default function RootLayout() {
     if (error) throw error;
     if (fontsLoaded) {
       SplashScreen.hideAsync();
-      if (Platform.OS === 'android') {
+      if (Platform.OS === "android") {
         try {
-          changeNavigationBarColor('#ffffff', true);
+          changeNavigationBarColor("#ffffff", true);
         } catch (e) {
           console.error(e);
         }
@@ -44,21 +50,27 @@ export default function RootLayout() {
   if (!fontsLoaded && !error) return null;
 
   return (
-    <SafeAreaProvider>
-      <StatusBar backgroundColor="transparent" translucent barStyle="dark-content" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: Platform.OS === 'android' ? 'fade' : 'default',
-          contentStyle: {
-            backgroundColor: '#EAE5D6',
-          },
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </SafeAreaProvider>
+    <AuthProvider>
+      <SafeAreaProvider>
+        <StatusBar
+          backgroundColor="transparent"
+          translucent
+          barStyle="dark-content"
+        />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: Platform.OS === "android" ? "fade" : "default",
+            contentStyle: {
+              backgroundColor: "#EAE5D6",
+            },
+          }}
+        >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </SafeAreaProvider>
+    </AuthProvider>
   );
 }

@@ -1,30 +1,61 @@
-import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, SafeAreaView, Alert, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Pressable,
+} from "react-native";
 import { useRouter } from "expo-router";
-import { useState } from 'react';
+import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { supabase } from "../../lib/supabase"; // adjust if needed
+import { useAuth } from "../../context/authContext";
 
 const SignIn = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { setSession } = useAuth(); // grab setSession from context
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = () => {
-    setIsLoading(true);
-    
-    // Check for the hardcoded credentials
-    if (email === 'shyluck@gmail.com' && password === 'shyluckkk') {
-      // Simulate a brief loading state for better UX
-      setTimeout(() => {
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Missing Fields", "Please fill in all fields.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        Alert.alert("Login Failed", error.message);
         setIsLoading(false);
-        router.replace("/(tabs)/chat-screen");
-      }, 1000);
-    } else {
-      setTimeout(() => {
-        setIsLoading(false);
-        Alert.alert("Login Failed", "Invalid email or password. Please try again.");
-      }, 500);
+        return;
+      }
+
+      // Save session to context and navigate
+      setSession(data.session);
+      router.replace("/(tabs)/chat-screen");
+    } catch (err) {
+      Alert.alert(
+        "Unexpected Error",
+        "Something went wrong. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -56,7 +87,9 @@ const SignIn = () => {
                 marginTop: 10,
               }}
             >
-              <Text className="font-playBold text-3xl text-burgundy mb-4">Login</Text>
+              <Text className="font-playBold text-3xl text-burgundy mb-4">
+                Login
+              </Text>
 
               <TextInput
                 placeholder="Email"
@@ -77,39 +110,47 @@ const SignIn = () => {
                   value={password}
                   onChangeText={setPassword}
                 />
-                <Pressable 
-                  style={{ 
-                    position: 'absolute', 
-                    right: 12, 
-                    top: 0, 
-                    height: '100%', 
-                    justifyContent: 'center',
+                <Pressable
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: 0,
+                    height: "100%",
+                    justifyContent: "center",
                     width: 40,
-                    alignItems: 'center'
+                    alignItems: "center",
                   }}
                   onPressIn={() => setShowPassword(true)}
                   onPressOut={() => setShowPassword(false)}
                 >
-                  <Ionicons 
-                    name={showPassword ? "eye-off-outline" : "eye-outline"} 
-                    size={20} 
-                    color="#666" 
+                  <Ionicons
+                    name={showPassword ? "eye-off-outline" : "eye-outline"}
+                    size={20}
+                    color="#666"
                   />
                 </Pressable>
               </View>
 
-              <TouchableOpacity 
-                className={`bg-burgundy p-3 rounded-lg w-full ${isLoading ? 'opacity-70' : 'opacity-100'}`}
+              <TouchableOpacity
+                className={`bg-burgundy p-3 rounded-lg w-full ${
+                  isLoading ? "opacity-70" : "opacity-100"
+                }`}
                 onPress={handleLogin}
                 disabled={isLoading}
               >
                 <Text className="text-white text-center font-bold">
-                  {isLoading ? 'Logging in...' : 'Login'}
+                  {isLoading ? "Logging in..." : "Login"}
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => router.replace("/sign-up")} className="mt-4">
-                <Text className="text-burgundy text-sm">Don't have an account? <Text className="font-bold">Sign Up</Text></Text>
+              <TouchableOpacity
+                onPress={() => router.replace("/sign-up")}
+                className="mt-4"
+              >
+                <Text className="text-burgundy text-sm">
+                  Don't have an account?{" "}
+                  <Text className="font-bold">Sign Up</Text>
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
