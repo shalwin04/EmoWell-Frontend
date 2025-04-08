@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     session,
+    user: session?.user ?? null, // 👈 Add this line
     setSession,
     signOut,
     loading,

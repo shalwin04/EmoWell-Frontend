@@ -1,7 +1,19 @@
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  StyleSheet,
+} from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/context/authContext";
+import { submitJournal } from "@/lib/submitJournal"; // Adjust the import based on your project structure
 
 const Journal = () => {
   const [entry, setEntry] = useState("");
@@ -14,13 +26,37 @@ const Journal = () => {
     day: "numeric",
   });
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log("Saving entry:", entry);
-    console.log("Title:", title);
-    setEntry("");
-    Keyboard.dismiss();
+  const { user } = useAuth();
+  console.log("User ID:", user?.id);
+
+  const handleSave = async () => {
+    console.log("🧠 Save button clicked");
+
+    if (!entry.trim()) return;
+
+    try {
+      await submitJournal({
+        title,
+        content: entry,
+        mood_keyword: "", // Will be generated later
+        user_id: user?.id, // 👈 Grabbed from useAuth
+      });
+
+      console.log("Saved successfully!");
+      setEntry("");
+      Keyboard.dismiss();
+    } catch (error) {
+      console.error("Error saving journal:", error);
+    }
   };
+
+  // const handleSave = () => {
+  //   // TODO: Implement save functionality
+  //   console.log("Saving entry:", entry);
+  //   console.log("Title:", title);
+  //   setEntry("");
+  //   Keyboard.dismiss();
+  // };
 
   const handleTitleSubmit = () => {
     // If title is empty or just whitespace, reset to "Untitled"
@@ -52,7 +88,9 @@ const Journal = () => {
                 />
               ) : (
                 <TouchableOpacity onPress={() => setIsEditingTitle(true)}>
-                  <Text className="text-2xl font-bold text-gray-800">{title}</Text>
+                  <Text className="text-2xl font-bold text-gray-800">
+                    {title}
+                  </Text>
                 </TouchableOpacity>
               )}
               <Text className="text-sm text-gray-600 mt-1">{currentDate}</Text>
@@ -89,22 +127,22 @@ const Journal = () => {
 const styles = StyleSheet.create({
   journalInput: {
     flex: 1,
-    fontFamily: Platform.OS === 'ios' ? 'Noteworthy' : 'normal',
+    fontFamily: Platform.OS === "ios" ? "Noteworthy" : "normal",
     fontSize: 18,
     lineHeight: 28,
-    backgroundColor: '#fffef0',
+    backgroundColor: "#fffef0",
     borderWidth: 1,
-    borderColor: '#e0dfd0',
+    borderColor: "#e0dfd0",
     borderRadius: 8,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
   titleInput: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     padding: 0,
     margin: 0,
   },
