@@ -9,7 +9,7 @@ export const submitJournal = async ({
   mood_keyword?: string;
   user_id: string;
 }) => {
-  const response = await fetch("http://192.168.20.216:3000/journal", {
+  const response = await fetch("http://192.168.0.105:3000/journal", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

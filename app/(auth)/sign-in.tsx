@@ -49,6 +49,25 @@ const SignIn = () => {
       // Save session to context and navigate
       setSession(data.session);
       router.replace("/(tabs)/chat-screen");
+
+      const userId = data.session?.user?.id;
+
+      try {
+        await fetch("http://192.168.0.105:3000/sign-in", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${data.session.access_token}`, // optional
+          },
+          body: JSON.stringify({
+            userId,
+          }),
+        });
+
+        console.log("User ID sent to backend:", userId);
+      } catch (err) {
+        console.error("Failed to send userId to backend:", err);
+      }
     } catch (err) {
       Alert.alert(
         "Unexpected Error",
